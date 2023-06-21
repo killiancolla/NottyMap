@@ -1,79 +1,74 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import * as Location from 'expo-location'
-import MapView, { Marker } from 'react-native-maps';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Text, View, Button, Platform } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import IdentificationScreen from './screens/IdentificationScreen';
+import ConnexionScreen from './screens/ConnexionScreen';
+import InscriptionScreen from './screens/InscriptionScreen';
+import AcceuilScreen from './screens/AcceuilScreen';
+import InscriptionScreen from './screens/NotificationsScreen';
+import AddNotificationScreen from './screens/AddNotificationScreen';
+import SetNotificationsScreen from './screens/SetNotificationsScreen';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function App() {
-
-  const lat = 48.848242
-  const long = 2.395661
-  const rayon = 50
-
-  const [location, setLocation] = useState(null)
-  const [onZone, setOnZone] = useState(false)
-
-  function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
-    const R = 6371e3; // Rayon moyen de la terre en mètres
-    const dLat = deg2rad(lat2 - lat1);  // Convertir les degrés en radians
-    const dLon = deg2rad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2)
-      ;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c; // Distance en mètres
-    return distance;
-  }
-
-  function deg2rad(deg) {
-    return deg * (Math.PI / 180)
-  }
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
   useEffect(() => {
-    getLocationAsync()
-  }, [])
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-  useEffect(() => {
-    if (location !== null) {
-      const distance = getDistanceFromLatLonInMeters(location.latitude, location.longitude, lat, long);
-      if (distance <= rayon) {
-        setOnZone(true)
-      } else {
-        setOnZone(false)
-      }
-    }
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
 
-  }, [location])
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
 
-  const getLocationAsync = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync()
-    if (status === 'granted') {
-      const currentLocation = await Location.getCurrentPositionAsync({})
-      setLocation(currentLocation.coords)
-    } else {
-      console.log('Permissions de localisation refusées');
-    }
-  }
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
 
   return (
-    <View style={styles.container}>
-      {onZone && (
-        <>
-          <Text>Vous êtes dans la zone</Text>
-        </>
-      )}
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Identification" component={IdentificationScreen} />
+        <Stack.Screen name="Connexion" component={ConnexionScreen} />
+        <Stack.Screen name="Inscription" component={InscriptionScreen} />
+        <Stack.Screen name="Accueil" component={AcceuilScreen} />
+        <Stack.Screen name="Notification détails" component={NotificationsScreen} />
+        <Stack.Screen name="Ajout de Notification" component={AddNotificationScreen} />
+        <Stack.Screen name="Modification de Notifications" component={SetNotificationsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+
+//FONCTION INUTILE POUR LE MOMENT, SERVAIENT POUR LE TEST DE BONNE RECEPTION DE NOTIFICATION : FONCTIONNEL
+async function schedulePushNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "You've got mail! 📬",
+      body: 'Here is the notification body',
+      data: { data: 'goes here' },
+    },
+    trigger: { seconds: 2 },
+  });
+}
+
+
