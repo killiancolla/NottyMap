@@ -3,6 +3,6 @@ import { Text, View, StyleSheet, TouchableOpacity, FlatList, Image } from 'react
 import axios from 'axios';
 
 
-export default function AcceuilScreen({navigation}) {
+export default function AccueilScreen({navigation}) {
 
 }
