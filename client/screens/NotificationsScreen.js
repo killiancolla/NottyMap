@@ -6,7 +6,7 @@ const NotificationsScreen = () => {
   const [lieuxNotifications, setLieuxNotifications] = useState([]);
 
   useEffect(() => {
-    axios.get('http://your-api-url.com/notifications') // Remplacez par votre URL d'API
+    axios.get('http://localhost:3000/notifications') // Remplacez par votre URL d'API
       .then((response) => {
         setLieuxNotifications(response.data);
       })
