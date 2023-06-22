@@ -87,6 +87,13 @@ router
             });
         })(req, res, next);
     })
+    .patch('/addNotifs/:id', async (req, res) => {
+        let body = {
+            "$push": req.body
+        }
+        const updatedUser = await Users.findByIdAndUpdate(req.params.id, body, { new: true });
+        res.json(req.body);
+    })
     .patch('/:id', async (req, res) => {
         const updatedUser = await Users.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(req.body);
