@@ -39,7 +39,7 @@ router
     })
     .post('/register', async (req, res) => {
         try {
-            const { email, motDePasse } = req.body;
+            const { email, nom, age, motDePasse } = req.body;
 
             // Vérifiez si l'utilisateur existe déjà
             const existingUser = await Users.findOne({ login: email }); // Trouvez l'utilisateur par son nom d'utilisateur
@@ -54,6 +54,8 @@ router
             // // Créez un nouvel utilisateur
             const newUser = new Users({
                 email: email,
+                nom: nom,
+                age: age,
                 motDePasse: hashedPassword,
             });
 
