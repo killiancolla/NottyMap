@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+
+const myip = '10.74.0.113'
 
 const InscriptionScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -9,25 +13,41 @@ const InscriptionScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
 
-  const handleInscription = async () => {
-    if (password !== confirmPassword) {
-      Alert.alert("Erreur", "Les mots de passe ne correspondent pas");
-      return;
-    }
+  useEffect(() => {
+    const checkUserId = async () => {
+      const userId = await AsyncStorage.getItem('userId');
+      if (userId) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Accueil' }],
+        });
+      }
+    };
+    checkUserId();
+  }, []);
 
-    // Ici, ajoutez le code pour gérer l'inscription
-    const token = await Notifications.getExpoPushTokenAsync({
-      experienceId: '@username/projectSlug', // Replace with your expo username and project slug
-      guid: 'YOUR_GUID', // Replace with your GUID
-      type: 'apns',
-      development: true,
-    })
-      .then(token => {
-        console.log(token.data);
-      })
-      .catch(error => {
-        console.log(error);
+  const handleInscription = async (event) => {
+    event.preventDefault();
+    try {
+      let formData = {
+        nom: name,
+        age: age,
+        email: email,
+        motDePasse: password
+      }
+      const response = await axios.post(`http://${myip}:3001/api/users/register`, formData)
+      setEmail('')
+      setPassword('')
+      setName('')
+      setAge('')
+      setConfirmPassword('')
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Connexion' }],
       });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

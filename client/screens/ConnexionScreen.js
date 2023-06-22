@@ -8,7 +8,6 @@ const myip = '10.74.0.113'
 const ConnexionScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(false)
 
   useEffect(() => {
     const checkUserId = async () => {

@@ -10,7 +10,8 @@ const LieuNotificationSchema = mongoose.Schema({
 
 const UserSchema = mongoose.Schema({
     prenom: { type: String, required: false },
-    nom: { type: String, required: false },
+    nom: { type: String, required: true },
+    age: { type: Number, required: true },
     dateNaissance: { type: Date, required: false },
     email: { type: String, required: true },
     motDePasse: { type: String, required: true },
