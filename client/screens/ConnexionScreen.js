@@ -2,8 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingVi
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const myip = '10.74.0.113'
+import Constants from 'expo-constants';
 
 const ConnexionScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -29,7 +28,7 @@ const ConnexionScreen = ({ navigation }) => {
         username: email,
         password: password
       }
-      const response = await axios.post(`http://${myip}:3001/api/users/login`, formData)
+      const response = await axios.post(`http://${Constants.manifest.IP_ADDRESS}:3001/api/users/login`, formData)
       setEmail('')
       setPassword('')
       await AsyncStorage.setItem('userId', response.data.id);
@@ -56,6 +55,7 @@ const ConnexionScreen = ({ navigation }) => {
             onChangeText={setEmail}
             value={email}
             placeholder="Email"
+            placeholderTextColor='grey'
             keyboardType="email-address"
             autoCapitalize="none"
           />
@@ -65,6 +65,7 @@ const ConnexionScreen = ({ navigation }) => {
             onChangeText={setPassword}
             value={password}
             placeholder="Mot de passe"
+            placeholderTextColor='grey'
             secureTextEntry
           />
 

@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import Geolocation from 'react-native-geolocation-service';
+// import geolib from 'geolib';
+// import PushNotification from "react-native-push-notification";
 import axios from 'axios';
+import Constants from 'expo-constants';
 
-const myip = '10.74.0.121'
 const AccueilScreen = ({ navigation }) => {
   const [lieuxNotifications, setLieuxNotifications] = useState([]);
   const [id, setId] = useState(null);
@@ -16,8 +19,8 @@ const AccueilScreen = ({ navigation }) => {
           routes: [{ name: 'Identification' }],
         });
       } else {
-        const response = await axios.get(`http://${myip}:3001/api/users/${userId}`);
-        setLieuxNotifications(response.data.lieuxNotifications);
+        const response = await axios.get(`http://${Constants.manifest.IP_ADDRESS}:3001/api/users/${userId}`)
+        setLieuxNotifications(response.data.lieuxNotifications)
       }
     };
     checkUserId();

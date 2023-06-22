@@ -3,8 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvo
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-
-const myip = '10.74.0.113'
+import Constants from 'expo-constants';
 
 const InscriptionScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -35,7 +34,7 @@ const InscriptionScreen = ({ navigation }) => {
         email: email,
         motDePasse: password
       }
-      const response = await axios.post(`http://${myip}:3001/api/users/register`, formData)
+      const response = await axios.post(`http://${Constants.manifest.IP_ADDRESS}:3001/api/users/register`, formData)
       setEmail('')
       setPassword('')
       setName('')
@@ -64,6 +63,7 @@ const InscriptionScreen = ({ navigation }) => {
             onChangeText={setName}
             value={name}
             placeholder="Nom"
+            placeholderTextColor='grey'
           />
 
           <TextInput
@@ -71,6 +71,7 @@ const InscriptionScreen = ({ navigation }) => {
             onChangeText={setAge}
             value={age}
             placeholder="Age"
+            placeholderTextColor='grey'
             keyboardType="number-pad"
           />
 
@@ -80,6 +81,7 @@ const InscriptionScreen = ({ navigation }) => {
             value={email}
             placeholder="Email"
             keyboardType="email-address"
+            placeholderTextColor='grey'
             autoCapitalize="none"
           />
 
@@ -88,6 +90,7 @@ const InscriptionScreen = ({ navigation }) => {
             onChangeText={setPassword}
             value={password}
             placeholder="Mot de passe"
+            placeholderTextColor='grey'
             secureTextEntry
           />
 
@@ -96,6 +99,7 @@ const InscriptionScreen = ({ navigation }) => {
             onChangeText={setConfirmPassword}
             value={confirmPassword}
             placeholder="Confirmez le mot de passe"
+            placeholderTextColor='grey'
             secureTextEntry
           />
 

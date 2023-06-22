@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import Constants from 'expo-constants';
 
-const myip = '10.74.0.121'
 const NotificationsScreen = ({ navigation }) => {
   const [lieuxNotifications, setLieuxNotifications] = useState([]);
   useEffect(() => {
@@ -15,7 +15,7 @@ const NotificationsScreen = ({ navigation }) => {
           routes: [{ name: 'Identification' }],
         });
       } else {
-        const response = await axios.get(`http://${myip}:3001/api/users/${userId}`);
+        const response = await axios.get(`http://${Constants.manifest.IP_ADDRESS}:3001/api/users/${userId}`);
         setLieuxNotifications(response.data.lieuxNotifications);
       }
     };
