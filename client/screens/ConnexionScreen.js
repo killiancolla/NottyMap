@@ -26,8 +26,8 @@ const ConnexionScreen = ({ navigation }) => {
         secureTextEntry
       />
 
-      <TouchableOpacity 
-        style={styles.connexionButton} 
+      <TouchableOpacity
+        style={styles.connexionButton}
         onPress={() => {
           // Ici, ajoutez le code pour gérer la connexion
         }}

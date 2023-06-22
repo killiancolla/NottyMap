@@ -31,58 +31,60 @@ passport.use(new LocalStrategy(async (username, password, done) => {
 router.get('/', async (req, res) => {
     const users = await Users.find();
     res.json(users);
-});
+})
+    .post('/register', async (req, res) => {
+        try {
+            const { email, motDePasse } = req.body;
 
-router.post('/register', async (req, res) => {
-    try {
-        const { email, motDePasse } = req.body;
-
-        // Vérifiez si l'utilisateur existe déjà
-        const existingUser = await Users.findOne({ login: email }); // Trouvez l'utilisateur par son nom d'utilisateur
-        if (existingUser) {
-            return res.status(400).json({ message: 'Email already exists.' });
-        }
-
-        // // Hachez le mot de passe
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(motDePasse, salt);
-
-        // // Créez un nouvel utilisateur
-        const newUser = new Users({
-            email: email,
-            motDePasse: hashedPassword,
-        });
-
-        // // Sauvegardez l'utilisateur dans la base de données
-        await newUser.save();
-
-        res.status(201).json({ message: 'User registered successfully.' });
-    } catch (err) {
-        res.status(500).json({ message: 'Error registering user.', error: err });
-    }
-});
-
-router.post('/login', (req, res, next) => {
-    passport.authenticate('local', { session: false }, (err, user, info) => {
-        if (err || !user) {
-            return res.status(400).json({
-                message: 'Something is not right',
-                user: user,
-            });
-        }
-
-        req.login(user, { session: false }, (err) => {
-            if (err) {
-                res.send(err);
+            // Vérifiez si l'utilisateur existe déjà
+            const existingUser = await Users.findOne({ login: email }); // Trouvez l'utilisateur par son nom d'utilisateur
+            if (existingUser) {
+                return res.status(400).json({ message: 'Email already exists.' });
             }
 
-            const token = jwt.sign({ id: user.id }, 'your_jwt_secret', {
-                expiresIn: '1h',
+            // // Hachez le mot de passe
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(motDePasse, salt);
+
+            // // Créez un nouvel utilisateur
+            const newUser = new Users({
+                email: email,
+                motDePasse: hashedPassword,
             });
 
-            res.status(201).json({ id: user.id });
-        });
-    })(req, res, next);
-});
+            // // Sauvegardez l'utilisateur dans la base de données
+            await newUser.save();
+
+            res.status(201).json({ message: 'User registered successfully.' });
+        } catch (err) {
+            res.status(500).json({ message: 'Error registering user.', error: err });
+        }
+    })
+    .post('/login', (req, res, next) => {
+        passport.authenticate('local', { session: false }, (err, user, info) => {
+            if (err || !user) {
+                return res.status(400).json({
+                    message: 'Something is not right',
+                    user: user,
+                });
+            }
+
+            req.login(user, { session: false }, (err) => {
+                if (err) {
+                    res.send(err);
+                }
+
+                const token = jwt.sign({ id: user.id }, 'your_jwt_secret', {
+                    expiresIn: '1h',
+                });
+
+                res.status(201).json({ id: user.id });
+            });
+        })(req, res, next);
+    })
+    .patch('/:id', async (req, res) => {
+        const updatedUser = await Users.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(req.body);
+    });
 
 module.exports = router;
