@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Constants from 'expo-constants';
@@ -19,8 +19,13 @@ const NotificationsScreen = ({ navigation }) => {
         setLieuxNotifications(response.data.lieuxNotifications);
       }
     };
+
     checkUserId();
-  }, []);
+
+    const unsubscribe = navigation.addListener('focus', checkUserId);
+
+    return unsubscribe;
+  }, [navigation]);
 
   const handleDeconnexion = async (event) => {
     try {
@@ -42,15 +47,17 @@ const NotificationsScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Lieux de notifications:</Text>
-        {lieuxNotifications.map((lieu) => (
-          <View key={lieu._id} style={styles.card}>
-            <Text style={styles.cardText}>Nom: {lieu.nom}</Text>
-            <Text style={styles.cardText}>Latitude: {lieu.latitude}</Text>
-            <Text style={styles.cardText}>Longitude: {lieu.longitude}</Text>
-            <Text style={styles.cardText}>Rayon: {lieu.rayon}</Text>
-            <Text style={styles.cardText}>Message: {lieu.message}</Text>
-          </View>
-        ))}
+        <ScrollView>
+          {lieuxNotifications.map((lieu, index) => (
+            <View key={index} style={styles.card}>
+              <Text style={styles.cardText}>Nom: {lieu.nom}</Text>
+              <Text style={styles.cardText}>Latitude: {lieu.latitude}</Text>
+              <Text style={styles.cardText}>Longitude: {lieu.longitude}</Text>
+              <Text style={styles.cardText}>Rayon: {lieu.rayon}m</Text>
+              <Text style={styles.cardText}>Message: {lieu.message}</Text>
+            </View>
+          ))}
+        </ScrollView>
       </View>
       <TouchableOpacity style={styles.logoutButton} onPress={handleDeconnexion}>
         <Text style={styles.logoutButtonText}>Déconnexion</Text>
@@ -65,26 +72,15 @@ const NotificationsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    padding: 20,
+    padding: 10,
+    backgroundColor: '#fff',
   },
   content: {
     flex: 1,
   },
-  logoutButton: {
-    alignSelf: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: 'red',
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  logoutButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
   title: {
-    fontSize: 18,
+    fontSize: 20,
+    fontWeight: 'bold',
     marginBottom: 10,
   },
   card: {
@@ -97,17 +93,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
   },
-  addButton: {
-    alignSelf: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: 'blue',
+  logoutButton: {
+    padding: 10,
+    backgroundColor: '#f00',
     borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  logoutButtonText: {
+    color: '#fff',
+    fontSize: 18,
+  },
+  addButton: {
+    padding: 10,
+    backgroundColor: '#00f',
+    borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 10,
   },
   addButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: '#fff',
+    fontSize: 18,
   },
 });
+
 
 export default NotificationsScreen;

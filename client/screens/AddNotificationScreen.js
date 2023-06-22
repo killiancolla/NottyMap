@@ -4,14 +4,16 @@ import axios from 'axios';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
-const AddNotificationScreen = () => {
+import MapView, { Marker } from 'react-native-maps';
+
+const AddNotificationScreen = ({ navigation }) => {
   const [nom, setNom] = useState('');
   const [longitude, setLongitude] = useState('');
   const [latitude, setLatitude] = useState('');
   const [rayon, setRayon] = useState('');
   const [message, setMessage] = useState('');
   const [id, setId] = useState(null);
-
+  // const [markerPosition, setMarkerPosition] = useState(null);
 
   useEffect(() => {
     const checkUserId = async () => {
@@ -33,13 +35,18 @@ const AddNotificationScreen = () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status === 'granted') {
         const location = await Location.getCurrentPositionAsync({});
-        setLongitude(location.coords.longitude.toString());
-        setLatitude(location.coords.latitude.toString());
+        // setLongitude(location.coords.longitude.toString());
+        // setLatitude(location.coords.latitude.toString());
       }
     };
 
     fetchUserLocation();
   }, []);
+
+  const handleMapPress = (e) => {
+    setLatitude(e.nativeEvent.coordinate.latitude);
+    setLongitude(e.nativeEvent.coordinate.longitude);
+  };
 
   const handleFormSubmit = async () => {
     try {
@@ -54,11 +61,12 @@ const AddNotificationScreen = () => {
       console.log(notificationData)
 
       const response = await axios.patch(`http://${Constants.manifest.IP_ADDRESS}:3001/api/users/addNotifs/${id}`, notificationData);
-      console.log(response.data);
+      navigation.navigate('Liste des notifications')
     } catch (error) {
       console.log(error);
     }
   };
+
 
   return (
     <View style={styles.container}>
@@ -70,20 +78,19 @@ const AddNotificationScreen = () => {
         value={nom}
         onChangeText={setNom}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Latitude"
-        placeholderTextColor={'grey'}
-        value={latitude}
-        onChangeText={setLatitude}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Longitude"
-        placeholderTextColor={'grey'}
-        value={longitude}
-        onChangeText={setLongitude}
-      />
+      <MapView
+        style={styles.map}
+        onPress={handleMapPress}
+      >
+        {(latitude && longitude) && (
+          <Marker coordinate={{ latitude, longitude }} />
+        )}
+      </MapView>
+      {(latitude && longitude) && (
+        <Text style={styles.pointConfirmation}>
+          Point sélectionné à la latitude {latitude.toFixed(3)} et la longitude {longitude.toFixed(3)}
+        </Text>
+      )}
       <TextInput
         style={styles.input}
         placeholder="Rayon"
@@ -130,6 +137,15 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  map: {
+    width: '100%',
+    height: 300,
+  },
+  pointConfirmation: {
+    fontSize: 14,
+    color: 'green',
+    marginBottom: 10,
   },
 });
 

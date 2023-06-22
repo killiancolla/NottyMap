@@ -103,8 +103,8 @@ const AccueilScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.content}>
         {thisPlace.length > 0 ? (
-          thisPlace.map((place) =>
-            <Text>{place.message}</Text>
+          thisPlace.map((place, index) =>
+            <Text key={index}>{place.message}</Text>
           )
         ) : (
           <Text>Loading....</Text>

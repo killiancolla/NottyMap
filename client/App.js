@@ -47,12 +47,30 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Identification" component={IdentificationScreen} />
-        <Stack.Screen name="Connexion" component={ConnexionScreen} />
-        <Stack.Screen name="Inscription" component={InscriptionScreen} />
-        <Stack.Screen name="Liste des notifications" component={NotificationsScreen} />
-        <Stack.Screen name="Ajouter une notification" component={AddNotificationScreen} />
-        <Stack.Screen name="Accueil" component={AccueilScreen} />
+        <Stack.Screen
+          name="Identification"
+          component={IdentificationScreen}
+        />
+        <Stack.Screen
+          name="Connexion"
+          component={ConnexionScreen}
+        />
+        <Stack.Screen
+          name="Inscription"
+          component={InscriptionScreen}
+        />
+        <Stack.Screen
+          name="Liste des notifications"
+          component={NotificationsScreen}
+        />
+        <Stack.Screen
+          name="Ajouter une notification"
+          component={AddNotificationScreen}
+        />
+        <Stack.Screen
+          name="Accueil"
+          component={AccueilScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
