@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Location from 'expo-location'
 // import Geolocation from 'react-native-geolocation-service';
 // import geolib from 'geolib';
 // import PushNotification from "react-native-push-notification";
 import axios from 'axios';
 import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
 
 const AccueilScreen = ({ navigation }) => {
   const [lieuxNotifications, setLieuxNotifications] = useState([]);
-  const [id, setId] = useState(null);
+  const [location, setLocation] = useState(null)
+  const [thisPlace, setThisPlace] = useState([])
+
   useEffect(() => {
     const checkUserId = async () => {
       const userId = await AsyncStorage.getItem('userId');
@@ -23,8 +27,32 @@ const AccueilScreen = ({ navigation }) => {
         setLieuxNotifications(response.data.lieuxNotifications)
       }
     };
+    const getLocationAsync = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync()
+      if (status === 'granted') {
+        const currentLocation = await Location.getCurrentPositionAsync({})
+        setLocation(currentLocation.coords)
+      } else {
+        console.log('Permissions de localisation refusées');
+      }
+    }
+    getLocationAsync()
     checkUserId();
   }, []);
+
+  useEffect(() => {
+    if (location && lieuxNotifications.length > 0) {
+      const lieuxFiltres = lieuxNotifications.filter(lieu => {
+        const isWithinRadius = getDistanceFromLatLonInMeters(location.latitude, location.longitude, lieu.latitude, lieu.longitude) < lieu.rayon;
+        if (isWithinRadius) {
+          sendNotification(lieu.message);
+        }
+        return isWithinRadius;
+      });
+      setThisPlace(lieuxFiltres);
+    }
+  }, [location, lieuxNotifications]);
+
 
   const handleDeconnexion = async (event) => {
     try {
@@ -42,19 +70,45 @@ const AccueilScreen = ({ navigation }) => {
     navigation.navigate('Liste des notifications')
   }
 
+  function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371e3;
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+    return distance;
+  }
+
+  function deg2rad(deg) {
+    return deg * (Math.PI / 180)
+  }
+
+  async function sendNotification(message) {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "NottyMap",
+        body: message,
+        data: { data: 'goes here' },
+      },
+      trigger: { seconds: 2 },
+    });
+  }
+
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Lieux de notifications:</Text>
-        {lieuxNotifications.map((lieu) => (
-          <View key={lieu._id} style={styles.card}>
-            <Text style={styles.cardText}>Nom: {lieu.nom}</Text>
-            <Text style={styles.cardText}>Latitude: {lieu.latitude}</Text>
-            <Text style={styles.cardText}>Longitude: {lieu.longitude}</Text>
-            <Text style={styles.cardText}>Rayon: {lieu.rayon}</Text>
-            <Text style={styles.cardText}>Message: {lieu.message}</Text>
-          </View>
-        ))}
+        {thisPlace.length > 0 ? (
+          thisPlace.map((place) =>
+            <Text>{place.message}</Text>
+          )
+        ) : (
+          <Text>Loading....</Text>
+        )}
       </View>
       <TouchableOpacity style={styles.logoutButton} onPress={handleDeconnexion}>
         <Text style={styles.logoutButtonText}>Déconnexion</Text>

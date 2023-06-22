@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import axios from 'axios';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants  from 'expo-constants';
+import Constants from 'expo-constants';
 const AddNotificationScreen = () => {
   const [nom, setNom] = useState('');
   const [longitude, setLongitude] = useState('');
@@ -66,30 +66,35 @@ const AddNotificationScreen = () => {
       <TextInput
         style={styles.input}
         placeholder="Nom"
+        placeholderTextColor={'grey'}
         value={nom}
         onChangeText={setNom}
       />
       <TextInput
         style={styles.input}
-        placeholder="Longitude"
-        value={longitude}
-        onChangeText={setLongitude}
-      />
-      <TextInput
-        style={styles.input}
         placeholder="Latitude"
+        placeholderTextColor={'grey'}
         value={latitude}
         onChangeText={setLatitude}
       />
       <TextInput
         style={styles.input}
+        placeholder="Longitude"
+        placeholderTextColor={'grey'}
+        value={longitude}
+        onChangeText={setLongitude}
+      />
+      <TextInput
+        style={styles.input}
         placeholder="Rayon"
+        placeholderTextColor={'grey'}
         value={rayon}
         onChangeText={setRayon}
       />
       <TextInput
         style={styles.input}
         placeholder="Message"
+        placeholderTextColor={'grey'}
         value={message}
         onChangeText={setMessage}
       />
