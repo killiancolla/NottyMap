@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
@@ -15,9 +15,9 @@ const AccueilScreen = ({ navigation }) => {
           index: 0,
           routes: [{ name: 'Identification' }],
         });
-      }else{
-        const response = await axios.get(`http://${myip}:3001/api/users/${userId}`)
-        setLieuxNotifications(response.data.lieuxNotifications)
+      } else {
+        const response = await axios.get(`http://${myip}:3001/api/users/${userId}`);
+        setLieuxNotifications(response.data.lieuxNotifications);
       }
     };
     checkUserId();
@@ -35,21 +35,69 @@ const AccueilScreen = ({ navigation }) => {
     }
   };
 
+  const handleNotif = async (event) => {
+    navigation.navigate('Liste des notifications')
+  }
+
   return (
-    <View style={{ padding: 20 }}>
-      <Text onPress={handleDeconnexion}>Deconnexion</Text>
-      <Text style={{ fontSize: 18 }}>Lieux de notifications:</Text>
-      {lieuxNotifications.map((lieu) => (
-        <View key={lieu._id}>
-          <Text>Nom: {lieu.nom}</Text>
-          <Text>Latitude: {lieu.latitude}</Text>
-          <Text>Longitude: {lieu.longitude}</Text>
-          <Text>Rayon: {lieu.rayon}</Text>
-          <Text>Message: {lieu.message}</Text>
-        </View>
-      ))}
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.title}>Lieux de notifications:</Text>
+        {lieuxNotifications.map((lieu) => (
+          <View key={lieu._id} style={styles.card}>
+            <Text style={styles.cardText}>Nom: {lieu.nom}</Text>
+            <Text style={styles.cardText}>Latitude: {lieu.latitude}</Text>
+            <Text style={styles.cardText}>Longitude: {lieu.longitude}</Text>
+            <Text style={styles.cardText}>Rayon: {lieu.rayon}</Text>
+            <Text style={styles.cardText}>Message: {lieu.message}</Text>
+          </View>
+        ))}
+      </View>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleDeconnexion}>
+        <Text style={styles.logoutButtonText}>Déconnexion</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleNotif}>
+        <Text style={styles.logoutButtonText}>Liste Notif</Text>
+      </TouchableOpacity>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
+  content: {
+    flex: 1,
+  },
+  logoutButton: {
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: 'red',
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  logoutButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  title: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  card: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  cardText: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+});
 
 export default AccueilScreen;

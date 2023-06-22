@@ -1,51 +1,95 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
-const UserScreen = ({ userId, navigation }) => {
-  const [user, setUser] = useState(null);
-
+const myip = '10.74.0.121'
+const NotificationsScreen = ({ navigation }) => {
+  const [lieuxNotifications, setLieuxNotifications] = useState([]);
   useEffect(() => {
-    fetchUser(userId);
+    const checkUserId = async () => {
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Identification' }],
+        });
+      } else {
+        const response = await axios.get(`http://${myip}:3001/api/users/${userId}`);
+        setLieuxNotifications(response.data.lieuxNotifications);
+      }
+    };
+    checkUserId();
   }, []);
 
-  const fetchUser = async (id) => {
+  const handleDeconnexion = async (event) => {
     try {
-      const response = await fetch(`/api/users/${id}`);
-      const userData = await response.json();
-      setUser(userData);
+      await AsyncStorage.removeItem('userId');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Identification' }],
+      });
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
-  const navigateToAddNotificationScreen = () => {
-    navigation.navigate('AddNotificationScreen');
-  };
-
-  if (!user) {
-    return (
-      <View>
-        <Text>Loading user data...</Text>
-      </View>
-    );
-  }
-
   return (
-    <View>
-      <Text>User: {user.email}</Text>
-      <Text>Notifications:</Text>
-      {user.lieuxNotifications.map((notification) => (
-        <View key={notification._id}>
-          <Text>Nom: {notification.nom}</Text>
-          <Text>Message: {notification.message}</Text>
-        </View>
-      ))}
-      <Button
-        title="Add Notification"
-        onPress={navigateToAddNotificationScreen}
-      />
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.title}>Lieux de notifications:</Text>
+        {lieuxNotifications.map((lieu) => (
+          <View key={lieu._id} style={styles.card}>
+            <Text style={styles.cardText}>Nom: {lieu.nom}</Text>
+            <Text style={styles.cardText}>Latitude: {lieu.latitude}</Text>
+            <Text style={styles.cardText}>Longitude: {lieu.longitude}</Text>
+            <Text style={styles.cardText}>Rayon: {lieu.rayon}</Text>
+            <Text style={styles.cardText}>Message: {lieu.message}</Text>
+          </View>
+        ))}
+      </View>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleDeconnexion}>
+        <Text style={styles.logoutButtonText}>Déconnexion</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
-export default UserScreen;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
+  content: {
+    flex: 1,
+  },
+  logoutButton: {
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: 'red',
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  logoutButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  title: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  card: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  cardText: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+});
+
+export default NotificationsScreen;
