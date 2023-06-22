@@ -28,10 +28,15 @@ passport.use(new LocalStrategy(async (username, password, done) => {
     }
 }));
 
-router.get('/', async (req, res) => {
-    const users = await Users.find();
-    res.json(users);
-})
+router
+    .get('/', async (req, res) => {
+        const users = await Users.find();
+        res.json(users);
+    })
+    .get('/:id', async (req, res) => {
+        const user = await Users.findById(req.params.id);
+        res.json(user);
+    })
     .post('/register', async (req, res) => {
         try {
             const { email, motDePasse } = req.body;
