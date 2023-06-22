@@ -1,12 +1,50 @@
-import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const myip = '10.74.0.113'
 
 const ConnexionScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [user, setUser] = useState(false)
+
+  useEffect(() => {
+    const checkUserId = async () => {
+      const userId = await AsyncStorage.getItem('userId');
+      if (userId) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Accueil' }],
+        });
+      }
+    };
+    checkUserId();
+  }, []);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      let formData = {
+        username: email,
+        password: password
+      }
+      const response = await axios.post(`http://${myip}:3001/api/users/login`, formData)
+      setEmail('')
+      setPassword('')
+      await AsyncStorage.setItem('userId', response.data.id);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Accueil' }],
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
@@ -31,11 +69,9 @@ const ConnexionScreen = ({ navigation }) => {
             secureTextEntry
           />
 
-          <TouchableOpacity 
-            style={styles.connexionButton} 
-            onPress={() => {
-              // Ici, ajoutez le code pour gérer la connexion
-            }}
+          <TouchableOpacity
+            style={styles.connexionButton}
+            onPress={handleSubmit}
           >
             <Text style={styles.connexionText}>Se connecter</Text>
           </TouchableOpacity>

@@ -1,18 +1,33 @@
-import React from 'react';
+import { React, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const IdentificationScreen = ({ navigation }) => {
+
+  useEffect(() => {
+    const checkUserId = async () => {
+      const userId = await AsyncStorage.getItem('userId');
+      if (userId) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Accueil' }],
+        });
+      }
+    };
+    checkUserId();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.inscriptionButton} 
+      <TouchableOpacity
+        style={styles.inscriptionButton}
         onPress={() => navigation.navigate('Inscription')}
       >
         <Text style={styles.inscriptionText}>Inscription</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={styles.connexionButton} 
+      <TouchableOpacity
+        style={styles.connexionButton}
         onPress={() => navigation.navigate('Connexion')}
       >
         <Text style={styles.connexionText}>Connexion</Text>

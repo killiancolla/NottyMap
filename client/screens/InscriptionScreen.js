@@ -17,21 +17,21 @@ const InscriptionScreen = ({ navigation }) => {
 
     // Ici, ajoutez le code pour gérer l'inscription
     const token = await Notifications.getExpoPushTokenAsync({
-        experienceId: '@username/projectSlug', // Replace with your expo username and project slug
-        guid: 'YOUR_GUID', // Replace with your GUID
-        type: 'apns',
-        development: true,
+      experienceId: '@username/projectSlug', // Replace with your expo username and project slug
+      guid: 'YOUR_GUID', // Replace with your GUID
+      type: 'apns',
+      development: true,
     })
-    .then(token => {
+      .then(token => {
         console.log(token.data);
-    })
-    .catch(error => {
+      })
+      .catch(error => {
         console.log(error);
-    });
+      });
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
@@ -79,8 +79,8 @@ const InscriptionScreen = ({ navigation }) => {
             secureTextEntry
           />
 
-          <TouchableOpacity 
-            style={styles.inscriptionButton} 
+          <TouchableOpacity
+            style={styles.inscriptionButton}
             onPress={handleInscription}
           >
             <Text style={styles.inscriptionText}>S'inscrire</Text>

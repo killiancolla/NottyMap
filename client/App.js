@@ -7,6 +7,7 @@ import * as Notifications from 'expo-notifications';
 import IdentificationScreen from './screens/IdentificationScreen';
 import ConnexionScreen from './screens/ConnexionScreen.js';
 import InscriptionScreen from './screens/InscriptionScreen';
+import AccueilScreen from './screens/AccueilScreen';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -23,22 +24,23 @@ export default function App() {
   const notificationListener = useRef();
   const responseListener = useRef();
 
-  useEffect(() => {
-    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+  // useEffect(() => {
+  //   registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      setNotification(notification);
-    });
+  //   notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+  //     setNotification(notification);
+  //   });
 
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
-    });
+  //   responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+  //     console.log(response);
+  //   });
 
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
+  //   return () => {
+  //     Notifications.removeNotificationSubscription(notificationListener.current);
+  //     Notifications.removeNotificationSubscription(responseListener.current);
+  //   };
+  // }, []);
+
 
   return (
     <NavigationContainer>
@@ -46,6 +48,7 @@ export default function App() {
         <Stack.Screen name="Identification" component={IdentificationScreen} />
         <Stack.Screen name="Connexion" component={ConnexionScreen} />
         <Stack.Screen name="Inscription" component={InscriptionScreen} />
+        <Stack.Screen name="Accueil" component={AccueilScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -76,23 +79,23 @@ async function registerForPushNotificationsAsync() {
     });
   }
 
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
-      return;
-    }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-    // console.log(token);
-  } else {
-    alert('Must use physical device for Push Notifications');
-  }
+  // if (Device.isDevice) {
+  //   const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  //   let finalStatus = existingStatus;
+  //   if (existingStatus !== 'granted') {
+  //     const { status } = await Notifications.requestPermissionsAsync();
+  //     finalStatus = status;
+  //   }
+  //   if (finalStatus !== 'granted') {
+  //     alert('Failed to get push token for push notification!');
+  //     return;
+  //   }
+  //   token = (await Notifications.getExpoPushTokenAsync()).data;
+  //   // console.log(token);
+  // } else {
+  //   alert('Must use physical device for Push Notifications');
+  // }
 
-  return token;
+  // return token;
 }
 
