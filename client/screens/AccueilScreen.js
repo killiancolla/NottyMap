@@ -23,7 +23,7 @@ const AccueilScreen = () => {
   }, []);
 
   useEffect(() => {
-    axios.get('http://your-api-url.com/notifications')
+    axios.get('http://localhost:3000/notifications')
       .then((response) => {
         setLieuxNotifications(response.data);
       })
