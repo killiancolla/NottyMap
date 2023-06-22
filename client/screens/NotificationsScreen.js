@@ -1,36 +1,51 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList } from 'react-native';
-import axios from 'axios';
+import { View, Text, Button } from 'react-native';
 
-const NotificationsScreen = () => {
-  const [lieuxNotifications, setLieuxNotifications] = useState([]);
+const UserScreen = ({ userId, navigation }) => {
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:3000/notifications') // Remplacez par votre URL d'API
-      .then((response) => {
-        setLieuxNotifications(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    fetchUser(userId);
   }, []);
 
-  const renderItem = ({ item }) => (
-    <View style={{ padding: 10, borderBottomColor: '#ccc', borderBottomWidth: 1 }}>
-      <Text style={{ fontSize: 18 }}>{item.nom}</Text>
-      <Text>Latitude: {item.latitude}, Longitude: {item.longitude}</Text>
-      <Text>Rayon: {item.rayon} mètres</Text>
-      <Text>Message: {item.message}</Text>
-    </View>
-  );
+  const fetchUser = async (id) => {
+    try {
+      const response = await fetch(`/api/users/${id}`);
+      const userData = await response.json();
+      setUser(userData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const navigateToAddNotificationScreen = () => {
+    navigation.navigate('AddNotificationScreen');
+  };
+
+  if (!user) {
+    return (
+      <View>
+        <Text>Loading user data...</Text>
+      </View>
+    );
+  }
 
   return (
-    <FlatList
-      data={lieuxNotifications}
-      renderItem={renderItem}
-      keyExtractor={item => item.id}
-    />
+    <View>
+      <Text>User: {user.email}</Text>
+      <Text>Notifications:</Text>
+      {user.lieuxNotifications.map((notification) => (
+        <View key={notification._id}>
+          <Text>Nom: {notification.nom}</Text>
+          <Text>Message: {notification.message}</Text>
+        </View>
+      ))}
+      <Button
+        title="Add Notification"
+        onPress={navigateToAddNotificationScreen}
+      />
+    </View>
   );
 };
 
-export default NotificationsScreen;
+export default UserScreen;
