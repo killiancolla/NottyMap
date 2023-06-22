@@ -1,14 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
 async function registerForPushNotificationsAsync() {
     let token;
 
