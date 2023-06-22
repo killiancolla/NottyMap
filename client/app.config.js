@@ -1,3 +1,3 @@
 export default {
-    IP_ADDRESS: '<your-ip>'
+    IP_ADDRESS: '10.74.0.121'
 };

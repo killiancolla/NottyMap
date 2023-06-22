@@ -34,6 +34,10 @@ const NotificationsScreen = ({ navigation }) => {
     }
   };
 
+  const handleAddNotification = () => {
+    navigation.navigate('Ajouter une notification');
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -50,6 +54,9 @@ const NotificationsScreen = ({ navigation }) => {
       </View>
       <TouchableOpacity style={styles.logoutButton} onPress={handleDeconnexion}>
         <Text style={styles.logoutButtonText}>Déconnexion</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.addButton} onPress={handleAddNotification}>
+        <Text style={styles.addButtonText}>Ajouter une notification</Text>
       </TouchableOpacity>
     </View>
   );
@@ -89,6 +96,17 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 16,
     marginBottom: 5,
+  },
+  addButton: {
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: 'blue',
+    borderRadius: 5,
+  },
+  addButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

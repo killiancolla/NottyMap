@@ -9,6 +9,7 @@ import ConnexionScreen from './screens/ConnexionScreen.js';
 import InscriptionScreen from './screens/InscriptionScreen';
 import AccueilScreen from './screens/AccueilScreen';
 import NotificationsScreen from './screens/NotificationsScreen';
+import AddNotificationScreen from './screens/AddNotificationScreen';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -50,6 +51,7 @@ export default function App() {
         <Stack.Screen name="Connexion" component={ConnexionScreen} />
         <Stack.Screen name="Inscription" component={InscriptionScreen} />
         <Stack.Screen name="Liste des notifications" component={NotificationsScreen} />
+        <Stack.Screen name="Ajouter une notification" component={AddNotificationScreen} />
         <Stack.Screen name="Accueil" component={AccueilScreen} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -90,11 +90,20 @@ router
         })(req, res, next);
     })
     .patch('/addNotifs/:id', async (req, res) => {
+        console.log(req.body);
         let body = {
-            "$push": req.body
+            "$push": {
+                "lieuxNotifications": [req.body]
+            }
         }
-        const updatedUser = await Users.findByIdAndUpdate(req.params.id, body, { new: true });
-        res.json(req.body);
+        try {
+            const updatedUser = await Users.findByIdAndUpdate(req.params.id, body, { new: true });
+            console.log(updatedUser);
+            res.json(updatedUser);
+        } catch (err) {
+            console.error("Error updating user:", err.message);
+            res.status(500).json({ error: 'Something went wrong' });
+        }
     })
     .patch('/:id', async (req, res) => {
         const updatedUser = await Users.findByIdAndUpdate(req.params.id, req.body, { new: true });
