@@ -39,6 +39,13 @@ const NotificationsScreen = ({ navigation }) => {
     }
   };
 
+  const handleDeleteNotification = async (lieu) => {
+    const userId = await AsyncStorage.getItem('userId');
+    const response = await axios.delete(`http://${Constants.manifest.IP_ADDRESS}:3001/api/users/deleteNotif/${userId}/${lieu.nom}`);
+    setLieuxNotifications(lieuxNotifications.filter(item => item.nom !== lieu.nom));
+  };
+
+
   const handleAddNotification = () => {
     navigation.navigate('Ajouter une notification');
   };
@@ -55,6 +62,9 @@ const NotificationsScreen = ({ navigation }) => {
               <Text style={styles.cardText}>Longitude: {lieu.longitude}</Text>
               <Text style={styles.cardText}>Rayon: {lieu.rayon}m</Text>
               <Text style={styles.cardText}>Message: {lieu.message}</Text>
+              <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteNotification(lieu)}>
+                <Text style={styles.deleteButtonText}>Supprimer</Text>
+              </TouchableOpacity>
             </View>
           ))}
         </ScrollView>
@@ -67,6 +77,7 @@ const NotificationsScreen = ({ navigation }) => {
       </TouchableOpacity>
     </View>
   );
+
 };
 
 const styles = StyleSheet.create({
@@ -114,6 +125,20 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#fff',
     fontSize: 18,
+  },
+  deleteButton: {
+    marginTop: 10, // Espacement du dessus
+    alignSelf: 'center', // Aligner au centre
+    paddingVertical: 10, // Padding vertical
+    paddingHorizontal: 20, // Padding horizontal
+    backgroundColor: '#ff0000', // Couleur du fond
+    borderRadius: 5, // Rayon de la bordure
+  },
+
+  deleteButtonText: {
+    color: '#ffffff', // Couleur du texte
+    fontSize: 16, // Taille de la police
+    fontWeight: 'bold', // Poids de la police
   },
 });
 

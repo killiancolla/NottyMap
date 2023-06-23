@@ -1,20 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location'
-// import Geolocation from 'react-native-geolocation-service';
-// import geolib from 'geolib';
-// import PushNotification from "react-native-push-notification";
+import { useIsFocused, useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
+import MapView, { Marker } from 'react-native-maps';
 
 const AccueilScreen = ({ navigation }) => {
   const [lieuxNotifications, setLieuxNotifications] = useState([]);
   const [location, setLocation] = useState(null)
   const [thisPlace, setThisPlace] = useState([])
+  const isFocused = useIsFocused();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const getLocationAsync = async () => {
+        const { status } = await Location.requestForegroundPermissionsAsync()
+        if (status === 'granted') {
+          const currentLocation = await Location.getCurrentPositionAsync({})
+          setLocation(currentLocation.coords)
+        } else {
+          console.log('Permissions de localisation refusées');
+        }
+      }
+      getLocationAsync();
+
+      return () => setLocation(null);  // Cette ligne est exécutée lorsque l'écran perd le focus
+    }, [])
+  );
 
   useEffect(() => {
+    if (!isFocused) return;
     const checkUserId = async () => {
       const userId = await AsyncStorage.getItem('userId');
       if (!userId) {
@@ -27,31 +45,23 @@ const AccueilScreen = ({ navigation }) => {
         setLieuxNotifications(response.data.lieuxNotifications)
       }
     };
-    const getLocationAsync = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync()
-      if (status === 'granted') {
-        const currentLocation = await Location.getCurrentPositionAsync({})
-        setLocation(currentLocation.coords)
-      } else {
-        console.log('Permissions de localisation refusées');
-      }
-    }
-    getLocationAsync()
     checkUserId();
-  }, []);
+  }, [isFocused]);
 
   useEffect(() => {
-    if (location && lieuxNotifications.length > 0) {
+    if (isFocused && location && lieuxNotifications.length > 0) {
       const lieuxFiltres = lieuxNotifications.filter(lieu => {
         const isWithinRadius = getDistanceFromLatLonInMeters(location.latitude, location.longitude, lieu.latitude, lieu.longitude) < lieu.rayon;
         if (isWithinRadius) {
-          sendNotification(lieu.message);
+          sendNotification('📍 Vous êtes arrivé à ' + lieu.nom + '. Cliquez pour consulter votre rappel');
         }
         return isWithinRadius;
       });
       setThisPlace(lieuxFiltres);
+    } else {
+      setThisPlace([])
     }
-  }, [location, lieuxNotifications]);
+  }, [isFocused, location, lieuxNotifications]);
 
 
   const handleDeconnexion = async (event) => {
@@ -102,14 +112,40 @@ const AccueilScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        {thisPlace.length > 0 ? (
-          thisPlace.map((place, index) =>
-            <Text key={index}>{place.message}</Text>
-          )
+        {!location ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="red" />
+            <Text style={styles.loadingText}>Loading....</Text>
+          </View>
         ) : (
-          <Text>Loading....</Text>
+          thisPlace.length > 0 ? (
+            thisPlace.map((place, index) => (
+              <View key={index} style={styles.placeContainer}>
+                <Text style={styles.placeName}>📍{place.nom}📍</Text>
+                <Text style={styles.placeMessage}>{place.message}</Text>
+                <MapView
+                  style={styles.map}
+                  initialRegion={{
+                    latitude: place.latitude,
+                    longitude: place.longitude,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                  }}
+                >
+                  <Marker
+                    coordinate={{ latitude: place.latitude, longitude: place.longitude }}
+                    title={place.nom}
+                    description={place.message}
+                  />
+                </MapView>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.noLieuxText}>Aucun lieu trouvé.</Text>
+          )
         )}
       </View>
+
       <TouchableOpacity style={styles.logoutButton} onPress={handleDeconnexion}>
         <Text style={styles.logoutButtonText}>Déconnexion</Text>
       </TouchableOpacity>
@@ -154,6 +190,53 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 16,
     marginBottom: 5,
+  },
+  placeCard: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 10,
+    padding: 10,
+    marginVertical: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  placeText: {
+    fontSize: 16,
+  },
+  placeContainer: {
+    marginBottom: 20,
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  placeName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    backgroundColor: '#f2f2f2',
+    padding: 10,
+  },
+  placeMessage: {
+    fontSize: 16,
+    textAlign: 'center',
+    backgroundColor: '#f2f2f2',
+    padding: 10,
+  },
+  map: {
+    height: 200,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 18,
+  },
+  noLieuxText: {
+    fontSize: 18,
+    color: 'gray',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 

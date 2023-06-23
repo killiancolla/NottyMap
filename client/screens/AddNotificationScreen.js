@@ -58,8 +58,6 @@ const AddNotificationScreen = ({ navigation }) => {
         message: message,
       };
 
-      console.log(notificationData)
-
       const response = await axios.patch(`http://${Constants.manifest.IP_ADDRESS}:3001/api/users/addNotifs/${id}`, notificationData);
       navigation.navigate('Liste des notifications')
     } catch (error) {
