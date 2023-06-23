@@ -69,11 +69,11 @@ const NotificationsScreen = ({ navigation }) => {
           ))}
         </ScrollView>
       </View>
-      <TouchableOpacity style={styles.logoutButton} onPress={handleDeconnexion}>
-        <Text style={styles.logoutButtonText}>Déconnexion</Text>
-      </TouchableOpacity>
       <TouchableOpacity style={styles.addButton} onPress={handleAddNotification}>
         <Text style={styles.addButtonText}>Ajouter une notification</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleDeconnexion}>
+        <Text style={styles.logoutButtonText}>Déconnexion</Text>
       </TouchableOpacity>
     </View>
   );
@@ -127,20 +127,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   deleteButton: {
-    marginTop: 10, // Espacement du dessus
-    alignSelf: 'center', // Aligner au centre
-    paddingVertical: 10, // Padding vertical
-    paddingHorizontal: 20, // Padding horizontal
-    backgroundColor: '#ff0000', // Couleur du fond
-    borderRadius: 5, // Rayon de la bordure
+    marginTop: 10,
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#ff0000',
+    borderRadius: 5,
   },
 
   deleteButtonText: {
-    color: '#ffffff', // Couleur du texte
-    fontSize: 16, // Taille de la police
-    fontWeight: 'bold', // Poids de la police
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
-
 
 export default NotificationsScreen;

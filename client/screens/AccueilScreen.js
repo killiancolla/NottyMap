@@ -25,7 +25,9 @@ const AccueilScreen = ({ navigation }) => {
           console.log('Permissions de localisation refusées');
         }
       }
-      getLocationAsync();
+      if (!location) {
+        getLocationAsync();
+      }
 
       return () => setLocation(null);  // Cette ligne est exécutée lorsque l'écran perd le focus
     }, [])
@@ -49,15 +51,19 @@ const AccueilScreen = ({ navigation }) => {
   }, [isFocused]);
 
   useEffect(() => {
-    if (isFocused && location && lieuxNotifications.length > 0) {
-      const lieuxFiltres = lieuxNotifications.filter(lieu => {
-        const isWithinRadius = getDistanceFromLatLonInMeters(location.latitude, location.longitude, lieu.latitude, lieu.longitude) < lieu.rayon;
-        if (isWithinRadius) {
-          sendNotification('📍 Vous êtes arrivé à ' + lieu.nom + '. Cliquez pour consulter votre rappel');
-        }
-        return isWithinRadius;
-      });
-      setThisPlace(lieuxFiltres);
+    if (lieuxNotifications.length > 0) {
+      if (isFocused && location) {
+        const lieuxFiltres = lieuxNotifications.filter(lieu => {
+          const isWithinRadius = getDistanceFromLatLonInMeters(location.latitude, location.longitude, lieu.latitude, lieu.longitude) < lieu.rayon;
+          if (isWithinRadius) {
+            sendNotification('📍 Vous êtes arrivé à ' + lieu.nom + '. Cliquez pour consulter votre rappel');
+          }
+          return isWithinRadius;
+        });
+        setThisPlace(lieuxFiltres);
+      } else {
+        setThisPlace([])
+      }
     } else {
       setThisPlace([])
     }
@@ -112,7 +118,7 @@ const AccueilScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        {!location ? (
+        {(!location && lieuxNotifications.length > 0) ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="red" />
             <Text style={styles.loadingText}>Loading....</Text>
@@ -146,11 +152,11 @@ const AccueilScreen = ({ navigation }) => {
         )}
       </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={handleDeconnexion}>
-        <Text style={styles.logoutButtonText}>Déconnexion</Text>
-      </TouchableOpacity>
       <TouchableOpacity style={styles.logoutButton} onPress={handleNotif}>
         <Text style={styles.logoutButtonText}>Liste Notif</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleDeconnexion}>
+        <Text style={styles.logoutButtonText}>Déconnexion</Text>
       </TouchableOpacity>
     </View>
   );
