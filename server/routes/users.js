@@ -90,7 +90,6 @@ router
         })(req, res, next);
     })
     .patch('/addNotifs/:id', async (req, res) => {
-        console.log(req.body);
         let body = {
             "$push": {
                 "lieuxNotifications": [req.body]
@@ -98,7 +97,6 @@ router
         }
         try {
             const updatedUser = await Users.findByIdAndUpdate(req.params.id, body, { new: true });
-            console.log(updatedUser);
             res.json(updatedUser);
         } catch (err) {
             console.error("Error updating user:", err.message);
@@ -108,6 +106,19 @@ router
     .patch('/:id', async (req, res) => {
         const updatedUser = await Users.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(req.body);
-    });
+    })
+    .delete('/:id', async (req, res) => {
+        const deletedUser = await Users.findByIdAndDelete(req.params.id);
+        res.json(deletedUser);
+    })
+    .delete('/deleteNotif/:id/:nom', async (req, res) => {
+        console.log(req.params.id);
+        console.log(req.params.nom);
+        const deletedNotif = await Users.updateOne(
+            { _id: req.params.id },
+            { $pull: { lieuxNotifications: { nom: req.params.nom } } }
+        )
+        res.json(deletedNotif)
+    })
 
 module.exports = router;
