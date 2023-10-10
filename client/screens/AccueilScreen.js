@@ -29,7 +29,7 @@ const AccueilScreen = ({ navigation }) => {
         getLocationAsync();
       }
 
-      return () => setLocation(null);  // Cette ligne est exécutée lorsque l'écran perd le focus
+      return () => setLocation(null);
     }, [])
   );
 
